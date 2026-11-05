@@ -11,7 +11,9 @@ vim.pack.add({
   -- Colorschme
   { src = "https://github.com/rebelot/kanagawa.nvim" },
   -- LSP config defaults
-  { src = "https://github.com/neovim/nvim-lspconfig" }
+  { src = "https://github.com/neovim/nvim-lspconfig" },
+  -- Live code review (for merge conflicts mainly)
+  { src = "https://github.com/esmuellert/codediff.nvim" },
 })
 
 -- Colorscheme
@@ -34,5 +36,11 @@ vim.keymap.set("n", "<leader>f", function ()
   vim.lsp.buf.format({ name = formatter, async = true })
 end, { desc = "Format buffer" }
 )
+
+require("codediff").setup({})
+
+vim.keymap.set("n", "<leader>cd", "<cmd>CodeDiff<cr>", {
+  desc = "Open Git diff",
+})
 
 vim.lsp.enable({ "ty", "ruff", "emmylua_ls" })
