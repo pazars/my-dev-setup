@@ -1,13 +1,29 @@
-# NeoVim config
+# Tools I use and recommend
 
-## CodeDiff
+In the age of AI I've come to appreciate tools that solve a specific problem as best as they can and limit needless resource usage.
+
+## Python
+- [uv](https://docs.astral.sh/uv/): Once you go `uv`, you never go back
+- [ruff](https://docs.astral.sh/ruff/): Honestly, anything Astral makes is a banger
+
+## Terminal  
+- [zoxide](https://zoxide.org/): `cd` wherever with just a few chars
+- [starship](https://starship.rs/): showing the git branch you are on next to the dir name. so good.
+
+## Neovim
+
+I'm still not convinced it's the more productive way to work but I enjoy using it.
+
+Config is still a work in progress.
+
+### CodeDiff
 
 - `:CodeDiff` / `<leader>cd`: Open CodeDiff (**c**ode **d**iff).
 - `g?`: Toggle help.
 - `Ctrl-w w`: Cycle between panes.
 - `q`: Exit CodeDiff.
 
-## Resolve merge conflicts
+#### Resolve merge conflicts
 
 `<leader>` = **Space**.
 
