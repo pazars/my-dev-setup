@@ -9,6 +9,11 @@ vim.opt.termguicolors = true
 -- Set space as the custom <leader> key
 vim.g.mapleader = " "
 
+-- Shortcut to show line's diagnostics
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, {
+  desc = "Show diagnostic message"
+})
+
 -- Install and load plugins
 vim.pack.add({
   -- Colorschme
@@ -18,6 +23,7 @@ vim.pack.add({
 -- If anything else fails, colorscheme stays
 vim.cmd.colorscheme("kanagawa")
 
+-- The rest of plugins
 vim.pack.add({
   -- LSP config defaults
   { src = "https://github.com/neovim/nvim-lspconfig" },
@@ -26,17 +32,17 @@ vim.pack.add({
   -- Auto-close brackets
   { src = "https://github.com/windwp/nvim-autopairs" },
   -- Code suggestions and completions
-  { src = "https://github.com/Saghen/blink.cmp", version = "v1.10.2" }
+  { src = "https://github.com/Saghen/blink.cmp",        version = "v1.10.2" }
 })
 
 require("codediff").setup({})
 require("nvim-autopairs").setup({})
 
--- Don't newline on completion enters.
--- Don't show completion suggestions for comments.
--- Disable plugin's colorscheme to user our own.
+-- Don't newline on completion enters
+-- Don't show completion suggestions for comments
+-- Match completion popup colors to the active colorscheme
 require("blink.cmp").setup({
-  enabled = function ()
+  enabled = function()
     local ok, node = pcall(vim.treesitter.get_node)
 
     if not ok or not node then
@@ -70,9 +76,14 @@ require("blink.cmp").setup({
   }
 })
 
-local formatters = { python = "ruff", lua = "emmylua_ls", rust = "rust_analyzer" }
+-- Define formatters and the shortcut to format
+local formatters = {
+  python = "ruff",
+  lua = "lua_ls",
+  rust = "rust_analyzer"
+}
 
-vim.keymap.set("n", "<leader>f", function ()
+vim.keymap.set("n", "<leader>f", function()
   local name = formatters[vim.bo.filetype]
 
   if not name then
@@ -80,30 +91,46 @@ vim.keymap.set("n", "<leader>f", function ()
     return
   end
 
-  local clients = vim.lsp.get_clients({
-    bufnr = 0,
-    name = name,
-    method = "textDocument/formatting"
-  })
-
-  if #clients == 0 then
-    vim.notify(name .. " is not attached or does not support formatting")
-    return
-  end
-
   vim.lsp.buf.format({
     name = name,
     async = true
   })
-end, { desc = "Format buffer" }
-)
+end, { desc = "Format buffer" })
 
+-- Shortcut for CodeDiff plugin
 vim.keymap.set("n", "<leader>cd", "<cmd>CodeDiff<cr>", {
   desc = "Open Git diff"
 })
 
+-- Enable code suggestions for all LSPs
 vim.lsp.config("*", {
   capabilities = require("blink.cmp").get_lsp_capabilities()
 })
 
-vim.lsp.enable({ "ty", "ruff", "emmylua_ls", "rust_analyzer" })
+-- Specific config for Lua LS to:
+--   - recognize vim in this config
+--   - find installed plugins from this file
+--   - set minimalistic formatting config
+vim.lsp.config("lua_ls", {
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { "vim" }
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false
+      },
+      format = {
+        enable = true,
+        defaultConfig = {
+          indent_style = "space",
+          indent_size = "2",
+          quote_style = "double",
+        }
+      }
+    }
+  }
+})
+
+vim.lsp.enable({ "ty", "ruff", "lua_ls", "rust_analyzer" })
