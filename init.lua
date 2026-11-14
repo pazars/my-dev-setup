@@ -14,6 +14,8 @@ vim.pack.add({
   { src = "https://github.com/neovim/nvim-lspconfig" },
   -- Live code review (for merge conflicts mainly)
   { src = "https://github.com/esmuellert/codediff.nvim" },
+  -- Auto-close brackets
+  { src = "https://github.com/windwp/nvim-autopairs" },
 })
 
 -- Colorscheme
@@ -42,6 +44,7 @@ end, { desc = "Format buffer" }
 )
 
 require("codediff").setup({})
+require("nvim-autopairs").setup({})
 
 vim.keymap.set("n", "<leader>cd", "<cmd>CodeDiff<cr>", {
   desc = "Open Git diff",
