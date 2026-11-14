@@ -22,7 +22,11 @@ vim.cmd.colorscheme("kanagawa")
 -- Set space as the custom <leader> key
 vim.g.mapleader = " "
 
-local formatters = { python = "ruff", lua = "emmylua_ls" }
+local formatters = { 
+  python = "ruff", 
+  lua = "emmylua_ls", 
+  rust = "rust_analyzer"
+}
 
 -- <leader> - f: format the current buffer
 vim.keymap.set("n", "<leader>f", function ()
@@ -43,4 +47,4 @@ vim.keymap.set("n", "<leader>cd", "<cmd>CodeDiff<cr>", {
   desc = "Open Git diff",
 })
 
-vim.lsp.enable({ "ty", "ruff", "emmylua_ls" })
+vim.lsp.enable({ "ty", "ruff", "emmylua_ls", "rust_analyzer" })
