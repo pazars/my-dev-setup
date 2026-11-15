@@ -14,6 +14,25 @@ vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, {
   desc = "Show diagnostic message"
 })
 
+-- Build telescope-fzf-native (fzf port), recommended for Telescope plugin
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    local name = ev.data.spec.name
+    local kind = ev.data.kind
+
+    if name == "telescope-fzf-native.nvim" and (kind == "install" or kind == "update") then
+      local result = vim.system({ "make" }, {
+        cwd = ev.data.path,
+        text = true,
+      }):wait()
+
+      if result.code ~= 0 then
+        error("telescope-fzf-native build failed:\n" .. (result.stderr or ""))
+      end
+    end
+  end,
+})
+
 -- Install and load plugins
 vim.pack.add({
   -- Colorschme
@@ -32,11 +51,20 @@ vim.pack.add({
   -- Auto-close brackets
   { src = "https://github.com/windwp/nvim-autopairs" },
   -- Code suggestions and completions
-  { src = "https://github.com/Saghen/blink.cmp",        version = "v1.10.2" }
+  { src = "https://github.com/Saghen/blink.cmp",        version = "v1.10.2" },
+  -- Nerd font icons
+  { src = 'https://github.com/nvim-tree/nvim-web-devicons' },
+  -- Recommended plugin for Telescope (with the build cmd earlier)
+  { src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim" },
+  -- Telescope to easily find, filter, preview, pick files
+  -- 2026/11/15: migration away from Plenary not in master yet
+  { src = "https://github.com/nvim-lua/plenary.nvim" },
+  { src = "https://github.com/nvim-telescope/telescope.nvim" },
 })
 
 require("codediff").setup({})
 require("nvim-autopairs").setup({})
+require("telescope").load_extension("fzf")
 
 -- Don't newline on completion enters
 -- Don't show completion suggestions for comments
