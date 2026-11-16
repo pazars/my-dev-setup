@@ -13,8 +13,15 @@ In the age of AI I've come to appreciate tools that solve a specific problem as 
 ## Neovim
 
 I'm still not convinced it's the more productive way to work but I enjoy using it.
+In the age of AI it brings back the sense of being in control and allows to eliminate needless resource wastage.
 
 Config is still a work in progress.
+
+### OS dependencies:
+- C toolchain e.g. [gcc](https://gcc.gnu.org/)
+- [rustup](https://rustup.rs/)
+- [fd](https://github.com/sharkdp/fd)
+- [ripgrep](https://github.com/BurntSushi/ripgrep/)
 
 ### CodeDiff
 
