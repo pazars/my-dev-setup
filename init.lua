@@ -33,6 +33,17 @@ vim.api.nvim_create_autocmd("PackChanged", {
   end,
 })
 
+-- Disable automatic comment continuation
+-- That means no new newline comment when pressing enter in a comment
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("DisableCommentContinuation", {
+    clear = true,
+  }),
+  callback = function()
+    vim.opt_local.formatoptions:remove({ "r", "o" })
+  end,
+})
+
 -- Install and load plugins
 vim.pack.add({
   -- Colorschme
