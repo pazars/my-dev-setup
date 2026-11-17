@@ -73,6 +73,39 @@ vim.pack.add({
   { src = "https://github.com/nvim-telescope/telescope.nvim" },
 })
 
+-- Helper function to disable blink's suggestions in comments
+local function completion_enabled()
+  if vim.api.nvim_get_mode().mode == "c" then
+    return true
+  end
+
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row = cursor[1] - 1
+  local col = math.max(cursor[2] - 1, 0)
+
+  local syntax = vim.fn.synIDattr(
+    vim.fn.synID(row + 1, col + 1, 1),
+    "name"
+  )
+
+  if syntax:lower():find("comment") then
+    return false
+  end
+
+  local ok, node = pcall(vim.treesitter.get_node, {
+    pos = { row, col },
+  })
+
+  while ok and node do
+    if node:type():find("comment") then
+      return false
+    end
+    node = node:parent()
+  end
+
+  return true
+end
+
 require("codediff").setup({})
 require("nvim-autopairs").setup({})
 require("telescope").load_extension("fzf")
@@ -81,38 +114,38 @@ require("telescope").load_extension("fzf")
 -- Don't show completion suggestions for comments
 -- Match completion popup colors to the active colorscheme
 require("blink.cmp").setup({
-  enabled = function()
-    local ok, node = pcall(vim.treesitter.get_node)
-
-    if not ok or not node then
-      return true
-    end
-
-    while node do
-      if node:type():find("comment") then
-        return false
-      end
-      node = node:parent()
-    end
-
-    return true
-  end,
-
-  keymap = {
-    preset = "default",
-    ["<CR>"] = { "accept", "fallback" }
-  },
+  enabled = completion_enabled,
 
   completion = {
+    list = {
+      selection = {
+        preselect = true,
+      },
+    },
     menu = {
-      winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None"
+      winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
     },
     documentation = {
       window = {
-        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder"
-      }
-    }
-  }
+        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+      },
+    },
+  },
+})
+
+vim.api.nvim_create_autocmd({
+  "TextChangedI",
+  "TextChangedP",
+  "CursorMovedI",
+}, {
+  group = vim.api.nvim_create_augroup("HideCompletionInComments", {
+    clear = true,
+  }),
+  callback = function()
+    if not completion_enabled() then
+      require("blink.cmp").hide()
+    end
+  end,
 })
 
 -- Define formatters and the shortcut to format
