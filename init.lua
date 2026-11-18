@@ -205,4 +205,29 @@ vim.lsp.config("lua_ls", {
   }
 })
 
+-- Run Clippy for diagnostics on save
+vim.lsp.config("rust_analyzer", {
+  settings = {
+    ["rust-analyzer"] = {
+      checkOnSave = true,
+      check = {
+        command = "clippy",
+      },
+    },
+  },
+})
+
+-- Run rustfmt before writing Rust files
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("RustFormatOnSave", { clear = true }),
+  pattern = "*.rs",
+  callback = function(ev)
+    vim.lsp.buf.format({
+      bufnr = ev.buf,
+      name = "rust_analyzer",
+      async = false,
+    })
+  end,
+})
+
 vim.lsp.enable({ "ty", "ruff", "lua_ls", "rust_analyzer" })
